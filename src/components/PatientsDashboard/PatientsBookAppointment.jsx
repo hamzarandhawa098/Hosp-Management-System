@@ -56,7 +56,7 @@ function PatientsBookAppointment() {
 
     loadDoctors();
 
-    return () => unsubscribe(); // Cleanup on unmount
+    return () => unsubscribe(); 
   }, []);
 
   const handleChange = (e) => {

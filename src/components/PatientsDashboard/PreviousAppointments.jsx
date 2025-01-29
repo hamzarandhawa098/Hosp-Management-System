@@ -5,7 +5,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 const auth = getAuth();
 
 function PreviousAppointments() {
-  const [appointments, setAppointments] = useState([]); 
+  const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [patientId, setPatientId] = useState(null);
@@ -24,28 +24,31 @@ function PreviousAppointments() {
   }, []);
 
   useEffect(() => {
+    if (!patientId) return;
+
+    setLoading(true);
+
     const fetchAppointments = async () => {
       try {
-        if (!patientId) return;
-
-        setLoading(true);
-
         const response = await axiosInstance.get(`/appointments`);
-        
-        const filteredAppointments = response.data.documents.filter(appointment =>
-          appointment.fields.patientUid?.stringValue === patientId
+
+        const filteredAppointments = response.data.documents.filter(
+          (appointment) => appointment.fields.patientUid?.stringValue === patientId
         );
 
         setAppointments(filteredAppointments || []);
-        console.log("Filtered Appointments:", filteredAppointments);
       } catch (err) {
         setError("No Appointments Available");
       } finally {
         setLoading(false);
       }
-    }; 
+    };
 
     fetchAppointments();
+
+    const interval = setInterval(fetchAppointments, 2000);
+
+    return () => clearInterval(interval); 
   }, [patientId]);
 
   if (loading) return <div>Loading...</div>;
@@ -78,14 +81,14 @@ function PreviousAppointments() {
           {appointments.map((appointment, index) => {
             const doctor = appointment.fields.doctorName?.stringValue || "";
             const date = appointment.fields.date?.stringValue || "";
-            const timeSlot = appointment.fields.slot?.stringValue || "";     
-            const status = appointment.fields.status?.stringValue || "";    
+            const timeSlot = appointment.fields.slot?.stringValue || "";
+            const status = appointment.fields.status?.stringValue || "";
             const department = appointment.fields.doctorSpecialization?.stringValue || "";
             const patientNotes = appointment.fields.summary?.stringValue || "";
 
             return (
               <tr key={index} className="text-center">
-                <td className="border border-gray-300 px-4 py-2">{doctor}</td> 
+                <td className="border border-gray-300 px-4 py-2">{doctor}</td>
                 <td className="border border-gray-300 px-4 py-2">{date}</td>
                 <td className="border border-gray-300 px-4 py-2">{timeSlot}</td>
                 <td
@@ -106,7 +109,7 @@ function PreviousAppointments() {
           })}
         </tbody>
       </table>
-    </div>      
+    </div>
   );
 }
 
