@@ -13,7 +13,6 @@ function DoctorDashboardPage () {
     <div className="bg-[#EBEBEB] flex flex-col gap-10 py-20 px-20 min-h-screen">
         <UpcomingAppointment />
         <AppointmentsRequest />
-        <Availability />
     </div>
    </div>
    </>

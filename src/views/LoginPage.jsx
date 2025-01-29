@@ -22,7 +22,7 @@ const LoginComponent = () => {
       return;
     }
     if (activeTab === "Admin") {
-      if (email === "admin@example.com" && password === "admin123") {
+      if (email === "admin@abc.com" && password === "pass123") {
         navigate("/admin/dashboard");
       } else {
         setError("Invalid email or password.");

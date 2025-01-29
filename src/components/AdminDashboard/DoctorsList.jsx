@@ -1,14 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../../api/axiosConfig"; 
 
 const DoctorsList = ({ setSelectedDoctor }) => {
-  const doctors = [
-    { id: 1, name: "Dr. John Doe", specialization: "Cardiologist" },
-    { id: 2, name: "Dr. Jane Smith", specialization: "Dermatologist" },
-    { id: 3, name: "Dr. Mark Taylor", specialization: "Neurologist" },
-  ]; 
+  const [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await axiosInstance.get(`/users`);
+        const userDocuments = response.data.documents || [];
+
+        const doctorList = userDocuments
+          .filter((doc) => doc.fields.role?.stringValue === "Doctor")
+          .map((doc) => ({
+            id: doc.fields.uid.stringValue,
+            name: doc.fields.name.stringValue,
+            specialization: doc.fields.specialization?.stringValue || "Not specified",
+          }));
+
+        setDoctors(doctorList);
+      } catch (error) {
+        console.error("Error fetching doctors data:", error.message);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
 
   return (
-    <div className="bg-white  shadow-md rounded-lg p-6">
+    <div className="bg-white shadow-md rounded-lg p-6">
       <h2 className="text-lg font-semibold mb-4">Doctors List</h2>
       <ul>
         {doctors.map((doctor) => (

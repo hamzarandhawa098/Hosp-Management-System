@@ -1,17 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../../api/axiosConfig"; 
 
 const DoctorAppointments = ({ doctor }) => {
-  const appointments = [
-    { id: 1, patient: "Alice", date: "2025-01-24", status: "Completed" },
-    { id: 2, patient: "Bob", date: "2025-01-25", status: "Pending" },
-    { id: 3, patient: "Charlie", date: "2025-01-26", status: "Cancelled" },
-    { id: 4, patient: "Charlie", date: "2025-01-26", status: "Cancelled" },
-    { id: 5, patient: "Charlie", date: "2025-01-26", status: "Cancelled" },
+  const [appointments, setAppointments] = useState([]);
 
-  ]; 
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await axiosInstance.get(`/appointments`);
+        const appointmentsData = response.data.documents || [];
+
+        const doctorAppointments = appointmentsData
+          .filter((doc) => doc.fields.doctorUid?.stringValue === doctor.id) 
+          .map((doc) => ({
+            id: doc.name.split('/').pop(), 
+            patient: doc.fields.patientName.stringValue,
+            date: doc.fields.date.stringValue,
+            status: doc.fields.status.stringValue,
+          }));
+
+        setAppointments(doctorAppointments);
+      } catch (error) {
+        console.error("Error fetching appointments data:", error.message);
+      }
+    };
+
+    fetchAppointments();
+  }, [doctor.id]); 
 
   return (
-    <div className="bg-white  p-6 col-span-2">
+    <div className="bg-white p-6 col-span-2">
       <h2 className="text-lg font-semibold mb-4">
         Appointments for {doctor.name}
       </h2>
