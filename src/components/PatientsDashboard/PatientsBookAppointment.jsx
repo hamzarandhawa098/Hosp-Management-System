@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import fetchDoctors from "../../api/fetchDoctors";
 import axiosInstance from "../../api/axiosConfig"; 
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { v4 as uuidv4 } from "uuid"; 
 
-const auth = getAuth(); 
-const user = auth.currentUser;
-const patientId = user ? user.uid : null;
+const auth = getAuth();
 
 function PatientsBookAppointment() {
   const [formData, setFormData] = useState({ 
@@ -35,8 +33,14 @@ function PatientsBookAppointment() {
   ];
 
   useEffect(() => {
-    const loggedInPatientUid = patientId; 
-    setPatientUid(loggedInPatientUid); 
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setPatientUid(user.uid);
+      } else {
+        setPatientUid(""); 
+      }
+    });
 
     const loadDoctors = async () => {
       try {
@@ -51,6 +55,8 @@ function PatientsBookAppointment() {
     };
 
     loadDoctors();
+
+    return () => unsubscribe(); // Cleanup on unmount
   }, []);
 
   const handleChange = (e) => {
@@ -63,15 +69,15 @@ function PatientsBookAppointment() {
     }
   };
 
-  const selectedDoctor = doctors.find((doc) => doc.name === formData.doctor);
-  const doctorName = selectedDoctor?.name || "";
-  const doctorSpecialization = selectedDoctor?.specialization || "";
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const currentDateTime = new Date();
+    if (!patientUid) {
+      alert("Please log in before booking an appointment.");
+      return;
+    }
 
+    const currentDateTime = new Date();
     const [startTime] = formData.slot.split(" - ");
 
     const convertTo24Hour = (time) => {
@@ -101,8 +107,8 @@ function PatientsBookAppointment() {
         patientName: { stringValue: formData.name },
         age: { integerValue: formData.age },
         gender: { stringValue: formData.gender },
-        doctorName: { stringValue: doctorName },
-        doctorSpecialization: { stringValue: doctorSpecialization },
+        doctorName: { stringValue: formData.doctor },
+        doctorSpecialization: { stringValue: doctors.find((doc) => doc.uid === doctorUid)?.specialization || "" },
         disease: { stringValue: formData.disease },
         doctorUid: { stringValue: doctorUid },
         slot: { stringValue: formData.slot },
