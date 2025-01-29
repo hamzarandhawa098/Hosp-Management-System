@@ -1,151 +1,140 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../api/axiosConfig";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, updateDoc } from "firebase/firestore";
 
-const initialAppointments = [
-  {
-    id: 1,
-    patient: "John Doe",
-    time: "10:00 AM",
-    date: "2025-01-24",
-    status: "requested",
-  },
-  {
-    id: 2,
-    patient: "Jane Smith",
-    time: "11:30 AM",
-    date: "2025-01-24",
-    status: "requested",
-  },
-  {
-    id: 3,
-    patient: "Sam Wilson",
-    time: "02:00 PM",
-    date: "2025-01-24",
-    status: "completed",
-  },
-  {
-    id: 4,
-    patient: "Jane Smith",
-    time: "11:30 AM",
-    date: "2025-01-24",
-    status: "requested",
-  },
-  {
-    id: 5,
-    patient: "Sam Wilson",
-    time: "02:00 PM",
-    date: "2025-01-24",
-    status: "completed",
-  },
-];
+const auth = getAuth();
+const db = getFirestore();
 
 function AppointmentsRequest() {
-  const [appointments, setAppointments] = useState(initialAppointments);
-  const [activeTab, setActiveTab] = useState("requested");
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [doctorUid, setDoctorUid] = useState(null);
 
-  const filteredAppointments = appointments.filter(
-    (appointment) => appointment.status === activeTab
-  );
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setDoctorUid(user.uid);
+      } else {
+        setError("No user is logged in.");
+      }
+    });
 
-  const handleAccept = (id) => {
-    setAppointments((prevAppointments) =>
-      prevAppointments.map((appointment) =>
-        appointment.id === id
-          ? { ...appointment, status: "completed" }
-          : appointment
-      )
-    );
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      if (!doctorUid) return;
+
+      try {
+        setLoading(true);
+        const response = await axiosInstance.get(`/appointments`);
+        console.log("Doctor ID", doctorUid);
+
+        const filteredAppointments = response.data.documents.filter(
+          (appointment) =>
+            appointment.fields.doctorUid?.stringValue === doctorUid &&
+            appointment.fields.status?.stringValue === "Pending"
+        );
+
+        setAppointments(filteredAppointments || []);
+      } catch (err) {
+        setError("Failed to load appointments.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [doctorUid]);
+
+  const updateAppointmentStatus = async (appointmentId, status) => {
+    const appointmentRef = doc(db, "appointments", appointmentId);
+    try {
+      await updateDoc(appointmentRef, {
+        status: status,
+      });
+      return true;
+    } catch (error) {
+      console.error("Error updating appointment status: ", error);
+      return false;
+    }
   };
 
-  const handleCancel = (id) => {
-    setAppointments((prevAppointments) =>
-      prevAppointments.filter((appointment) => appointment.id !== id)
-    );
+  const handleAccept = async (appointment) => {
+    const documentId = appointment.name.split("/").pop(); 
+    const success = await updateAppointmentStatus(documentId, "Accepted");
+    if (success) {
+      setAppointments((prevAppointments) =>
+        prevAppointments.filter((app) => app.name !== appointment.name)
+      );
+    }
   };
+
+  const handleCancel = async (appointment) => {
+    const documentId = appointment.name.split("/").pop(); 
+    const success = await updateAppointmentStatus(documentId, "Cancelled");
+    if (success) {
+      setAppointments((prevAppointments) =>
+        prevAppointments.filter((app) => app.name !== appointment.name)
+      );
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="bg-white w-full rounded-lg shadow-md">
       <div className="px-5 py-8">
-        <h1 className="text-2xl font-poppins font-semibold">Appointments</h1>
-      </div>
-
-      <div className="flex px-5 border-b border-gray-200">
-        <button
-          className={`px-4 text-[18px] font-bold py-2 font-poppins ${
-            activeTab === "requested"
-              ? "text-blue-500 border-b-2 border-blue-500"
-              : "text-gray-500"
-          }`}
-          onClick={() => setActiveTab("requested")}
-        >
-          Appointments Requested
-        </button>
-        <button
-          className={`px-4 py-2 text-[18px] font-bold font-poppins ${
-            activeTab === "completed"
-              ? "text-blue-500 border-b-2 border-blue-500"
-              : "text-gray-500"
-          }`}
-          onClick={() => setActiveTab("completed")}
-        >
-          Appointments Completed
-        </button>
+        <h1 className="text-2xl font-poppins font-semibold">Appointments Requested</h1>
       </div>
 
       <div className="p-5">
-        {filteredAppointments.length > 0 ? (
+        {appointments.length > 0 ? (
           <table className="w-full text-left border-collapse">
             <thead>
               <tr>
-                <th className="py-2 px-4 font-poppins border-b text-sm font-medium">
-                  Patient Name
-                </th>
-                <th className="py-2 px-4 font-poppins border-b text-sm font-medium">
-                  Appointment Time
-                </th>
-                <th className="py-2 px-4 border-b font-poppins  text-sm font-medium">
-                  Appointment Date
-                </th>
-                {activeTab === "requested" && (
-                  <th className="py-2 px-4 border-b font-poppins text-sm font-medium">
-                    Actions
-                  </th>
-                )}
+                <th className="py-2 px-4 font-poppins border-b text-sm font-medium">Patient Name</th>
+                <th className="py-2 px-4 font-poppins border-b text-sm font-medium">Appointment Time</th>
+                <th className="py-2 px-4 border-b font-poppins text-sm font-medium">Appointment Date</th>
+                <th className="py-2 px-4 border-b font-poppins text-sm font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredAppointments.map((appointment) => (
-                <tr key={appointment.id}>
+              {appointments.map((appointment, index) => (
+                <tr key={index}>
                   <td className="py-2 px-4 text-[16px] border-b">
-                    {appointment.patient}
+                    {appointment.fields.patientName?.stringValue || ""}
                   </td>
                   <td className="py-2 px-4 text-[16px] border-b">
-                    {appointment.time}
+                    {appointment.fields.slot?.stringValue || ""}
                   </td>
                   <td className="py-2 px-4 text-[16px] border-b">
-                    {appointment.date}
+                    {appointment.fields.date?.stringValue || ""}
                   </td>
-                  {activeTab === "requested" && (
-                    <td className="py-2 px-4 border-b">
-                      <button
-                        className="px-9 py-4 text-[16px] text-white bg-green-500 rounded-lg mr-2"
-                        onClick={() => handleAccept(appointment.id)}
-                      >
-                        Accept
-                      </button>
-                      <button
-                        className="px-9 py-4 text-[16px] text-white bg-red-500 rounded-lg"
-                        onClick={() => handleCancel(appointment.id)}
-                      >
-                        Cancel
-                      </button>
-                    </td>
-                  )}
+                  <td className="py-2 px-4 border-b">
+                    <button
+                      className="px-9 py-4 text-[16px] text-white bg-green-500 rounded-lg mr-2"
+                      onClick={() => handleAccept(appointment)}
+                    >
+                      Accept
+                    </button>
+                    <button
+                      className="px-9 py-4 text-[16px] text-white bg-red-500 rounded-lg"
+                      onClick={() => handleCancel(appointment)}
+                    >
+                      Cancel
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
-          <p className="text-gray-500">No appointments available.</p>
+          <p className="text-gray-500">No pending appointments available.</p>
         )}
       </div>
     </div>

@@ -1,88 +1,64 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../api/axiosConfig";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
+const auth = getAuth();
 
 function PreviousAppointments() {
-  const appointments = [
-    {
-      doctor: "Dr. John Doe",
-      date: "2025-01-20",
-      timeSlot: "10:00 AM - 11:00 AM",
-      status: "Accepted",
-      department: "Cardiology",
-      patientNotes: "Follow-up for chest pain",
-    },
-    {
-      doctor: "Dr. Jane Smith",
-      date: "2025-01-18",
-      timeSlot: "12:00 PM - 01:00 PM",
-      status: "Completed",
-      department: "Dermatology",
-      patientNotes: "Routine skin check",
-    },
-    {
-      doctor: "Dr. Emily White",
-      date: "2025-01-15",
-      timeSlot: "02:00 PM - 03:00 PM",
-      status: "Pending",
-      department: "Pediatrics",
-      patientNotes: "Consultation for flu symptoms",
-    },
-    {
-      doctor: "Dr. Michael Brown",
-      date: "2025-01-22",
-      timeSlot: "03:00 PM - 04:00 PM",
-      status: "Accepted",
-      department: "Orthopedics",
-      patientNotes: "Knee pain evaluation",
-    },
-    {
-      doctor: "Dr. Laura Green",
-      date: "2025-01-25",
-      timeSlot: "09:00 AM - 10:00 AM",
-      status: "Completed",
-      department: "Neurology",
-      patientNotes: "Migraine treatment review",
-    },
-    {
-      doctor: "Dr. John Doe",
-      date: "2025-01-20",
-      timeSlot: "10:00 AM - 11:00 AM",
-      status: "Accepted",
-      department: "Cardiology",
-      patientNotes: "Follow-up for chest pain",
-    },
-    {
-      doctor: "Dr. Jane Smith",
-      date: "2025-01-18",
-      timeSlot: "12:00 PM - 01:00 PM",
-      status: "Completed",
-      department: "Dermatology",
-      patientNotes: "Routine skin check",
-    },
-    {
-      doctor: "Dr. Emily White",
-      date: "2025-01-15",
-      timeSlot: "02:00 PM - 03:00 PM",
-      status: "Pending",
-      department: "Pediatrics",
-      patientNotes: "Consultation for flu symptoms",
-    },
-    {
-      doctor: "Dr. Michael Brown",
-      date: "2025-01-22",
-      timeSlot: "03:00 PM - 04:00 PM",
-      status: "Accepted",
-      department: "Orthopedics",
-      patientNotes: "Knee pain evaluation",
-    },
-    {
-      doctor: "Dr. Laura Green",
-      date: "2025-01-25",
-      timeSlot: "09:00 AM - 10:00 AM",
-      status: "Completed",
-      department: "Neurology",
-      patientNotes: "Migraine treatment review",
-    },
-  ];
+  const [appointments, setAppointments] = useState([]); 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [patientId, setPatientId] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setPatientId(user.uid);
+        console.log("Patient ID from Firebase:", user.uid);
+      } else {
+        setError("No user is logged in.");
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        if (!patientId) return;
+
+        setLoading(true);
+
+        const response = await axiosInstance.get(`/appointments`);
+        
+        const filteredAppointments = response.data.documents.filter(appointment =>
+          appointment.fields.patientUid?.stringValue === patientId
+        );
+
+        setAppointments(filteredAppointments || []);
+        console.log("Filtered Appointments:", filteredAppointments);
+      } catch (err) {
+        setError("No Appointments Available");
+      } finally {
+        setLoading(false);
+      }
+    }; 
+
+    fetchAppointments();
+  }, [patientId]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+
+  if (appointments.length === 0) {
+    return (
+      <div className="w-full max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6">
+        <h1 className="text-xl font-bold mb-4">Previous Appointments</h1>
+        <p className="text-gray-500">You have no previous appointments.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6">
@@ -99,29 +75,38 @@ function PreviousAppointments() {
           </tr>
         </thead>
         <tbody>
-          {appointments.map((appointment, index) => (
-            <tr key={index} className="text-center">
-              <td className="border border-gray-300 px-4 py-2">{appointment.doctor}</td>
-              <td className="border border-gray-300 px-4 py-2">{appointment.date}</td>
-              <td className="border border-gray-300 px-4 py-2">{appointment.timeSlot}</td>
-              <td
-                className={`border border-gray-300 px-4 py-2 font-semibold ${
-                  appointment.status === "Accepted"
-                    ? "text-green-500"
-                    : appointment.status === "Pending"
-                    ? "text-yellow-500"
-                    : "text-blue-500"
-                }`}
-              >
-                {appointment.status}
-              </td>
-              <td className="border border-gray-300 px-4 py-2">{appointment.department}</td>
-              <td className="border border-gray-300 px-4 py-2">{appointment.patientNotes}</td>
-            </tr>
-          ))}
+          {appointments.map((appointment, index) => {
+            const doctor = appointment.fields.doctorName?.stringValue || "";
+            const date = appointment.fields.date?.stringValue || "";
+            const timeSlot = appointment.fields.slot?.stringValue || "";     
+            const status = appointment.fields.status?.stringValue || "";    
+            const department = appointment.fields.doctorSpecialization?.stringValue || "";
+            const patientNotes = appointment.fields.summary?.stringValue || "";
+
+            return (
+              <tr key={index} className="text-center">
+                <td className="border border-gray-300 px-4 py-2">{doctor}</td> 
+                <td className="border border-gray-300 px-4 py-2">{date}</td>
+                <td className="border border-gray-300 px-4 py-2">{timeSlot}</td>
+                <td
+                  className={`border border-gray-300 px-4 py-2 font-semibold ${
+                    status === "Accepted"
+                      ? "text-green-500"
+                      : status === "Pending"
+                      ? "text-yellow-500"
+                      : "text-blue-500"
+                  }`}
+                >
+                  {status}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">{department}</td>
+                <td className="border border-gray-300 px-4 py-2">{patientNotes}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-    </div>
+    </div>      
   );
 }
 
