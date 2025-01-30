@@ -32,7 +32,7 @@ function PatientsDashboardPage() {
           onClick={closeModal}
         >
           <div
-            className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto relative"
+            className="bg-white p-6 rounded-lg shadow-lg w-fit max-w-2xl max-h-[90vh] overflow-y-auto relative "
             onClick={(e) => e.stopPropagation()}
           >
             <PatientsBookAppointment />

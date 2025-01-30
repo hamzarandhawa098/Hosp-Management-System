@@ -1,44 +1,46 @@
 import { useEffect, useState } from "react";
 import fetchDoctors from "../../api/fetchDoctors";
-import axiosInstance from "../../api/axiosConfig"; 
+import axiosInstance from "../../api/axiosConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { v4 as uuidv4 } from "uuid"; 
+import { v4 as uuidv4 } from "uuid";
+import { db } from "../../firebase/firebaseConfig";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 const auth = getAuth();
 
 function PatientsBookAppointment() {
-  const [formData, setFormData] = useState({ 
-    name: "", 
-    age: "",        
-    gender: "", 
+  const [formData, setFormData] = useState({
+    name: "",
+    age: "",
+    gender: "",
     disease: "",
     doctor: "",
     slot: "",
     date: "",
     contact: "",
-    summary: "", 
+    summary: "",
   });
 
   const [doctors, setDoctors] = useState([]);
-  const [doctorUid, setDoctorUid] = useState(""); 
-  const [patientUid, setPatientUid] = useState(""); 
-  const [loading, setLoading] = useState(true); 
-
-  const slots = [
+  const [doctorUid, setDoctorUid] = useState("");
+  const [patientUid, setPatientUid] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [appointments, setAppointments] = useState([]);
+  const [slots, setSlots] = useState([
     "10:00 AM - 11:00 AM",
     "12:00 PM - 01:00 PM",
     "02:00 PM - 03:00 PM",
     "03:00 PM - 04:00 PM",
     "04:00 PM - 05:00 PM",
-  ];
+    "05:00 PM - 06:00 PM",
+  ]);
 
   useEffect(() => {
-    // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setPatientUid(user.uid);
       } else {
-        setPatientUid(""); 
+        setPatientUid("");
       }
     });
 
@@ -56,8 +58,29 @@ function PatientsBookAppointment() {
 
     loadDoctors();
 
-    return () => unsubscribe(); 
+    return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const q = query(
+          collection(db, "appointments"),
+          where("doctorUid", "==", doctorUid),
+          where("date", "==", formData.date)
+        );
+        const querySnapshot = await getDocs(q);
+        const bookedSlots = querySnapshot.docs.map((doc) => doc.data().slot);
+        setAppointments(bookedSlots);
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    };
+
+    if (doctorUid && formData.date) {
+      fetchAppointments();
+    }
+  }, [doctorUid, formData.date]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,7 +88,7 @@ function PatientsBookAppointment() {
 
     if (name === "doctor") {
       const selectedDoctor = doctors.find((doc) => doc.name === value);
-      setDoctorUid(selectedDoctor?.uid || ""); 
+      setDoctorUid(selectedDoctor?.uid || "");
     }
   };
 
@@ -108,7 +131,10 @@ function PatientsBookAppointment() {
         age: { integerValue: formData.age },
         gender: { stringValue: formData.gender },
         doctorName: { stringValue: formData.doctor },
-        doctorSpecialization: { stringValue: doctors.find((doc) => doc.uid === doctorUid)?.specialization || "" },
+        doctorSpecialization: {
+          stringValue:
+            doctors.find((doc) => doc.uid === doctorUid)?.specialization || "",
+        },
         disease: { stringValue: formData.disease },
         doctorUid: { stringValue: doctorUid },
         slot: { stringValue: formData.slot },
@@ -129,7 +155,7 @@ function PatientsBookAppointment() {
         disease: "",
         doctor: "",
         slot: "",
-        date: "", 
+        date: "",
         contact: "",
         summary: "",
       });
@@ -169,11 +195,11 @@ function PatientsBookAppointment() {
             className="w-full px-4 py-4 border border-gray-300 rounded-md"
           />
 
-          <select 
-            name="gender" 
-            value={formData.gender} 
-            onChange={handleChange} 
-            required 
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            required
             className="w-full px-4 py-4 border border-gray-300 rounded-md"
           >
             <option value="">-- Select Gender --</option>
@@ -192,11 +218,11 @@ function PatientsBookAppointment() {
             className="w-full px-4 py-4 border border-gray-300 rounded-md"
           />
 
-          <select 
-            name="doctor" 
-            value={formData.doctor} 
-            onChange={handleChange} 
-            required 
+          <select
+            name="doctor"
+            value={formData.doctor}
+            onChange={handleChange}
+            required
             className="w-full px-4 py-4 border border-gray-300 rounded-md"
           >
             <option value="">-- Select a Doctor --</option>
@@ -206,20 +232,6 @@ function PatientsBookAppointment() {
               </option>
             ))}
           </select>
-
-          <select 
-            name="slot" 
-            value={formData.slot} 
-            onChange={handleChange} 
-            required 
-            className="w-full px-4 py-4 border border-gray-300 rounded-md"
-          >
-            <option value="">-- Select a Slot --</option>
-            {slots.map((slot, index) => (
-              <option key={index} value={slot}>{slot}</option>
-            ))}
-          </select>
-
           <input
             type="date"
             name="date"
@@ -228,6 +240,25 @@ function PatientsBookAppointment() {
             required
             className="w-full px-4 py-4 border border-gray-300 rounded-md"
           />
+
+          <select
+            name="slot"
+            value={formData.slot}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-4 border border-gray-300 rounded-md"
+          >
+            <option value="">-- Select a Slot --</option>
+            {slots.map((slot) => (
+              <option
+                key={slot}
+                value={slot}
+                disabled={appointments.includes(slot)}
+              >
+                {slot}
+              </option>
+            ))}
+          </select>
 
           <input
             type="text"
@@ -248,8 +279,8 @@ function PatientsBookAppointment() {
             className="w-full px-4 py-4 border border-gray-300 rounded-md"
           />
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="w-full bg-blue-500 text-white py-4 rounded-md hover:bg-blue-600 transition duration-200"
           >
             Book Appointment
