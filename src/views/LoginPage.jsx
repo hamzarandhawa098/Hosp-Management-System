@@ -45,7 +45,11 @@ const LoginComponent = () => {
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="w-full max-w-[600px]">
         <div className="flex flex-col items-center">
-          <img src={LogoLarge} alt="Iwiina Lab Logo" className="h-8 w-[147px]" />
+          <img
+            src={LogoLarge}
+            alt="Iwiina Lab Logo"
+            className="h-8 w-[147px]"
+          />
           <div className="flex gap-3 mt-6 px-2 py-[5px] rounded-full bg-[#1061E5]">
             {tabs.map((tab) => (
               <button
@@ -60,16 +64,23 @@ const LoginComponent = () => {
             ))}
           </div>
         </div>
-        {activeTab !== "Admin" && (
-          <div className="flex justify-center text-[16px] font-semibold mt-2 font-poppins">
-            Don't have an account? {" "}
-            <span className="ml-2">
-              <Link to={registerPath} className="hover:text-[#1061E5] hover:underline">
-                Signup
-              </Link>
+
+        <div className="flex justify-center text-[16px] font-semibold mt-2 font-poppins min-h-[24px]">
+          {activeTab !== "Admin" && (
+            <span className="flex">
+              Don't have an account?{" "}
+              <span className="ml-2">
+                <Link
+                  to={registerPath}
+                  className="hover:text-[#1061E5] hover:underline"
+                >
+                  Signup
+                </Link>
+              </span>
             </span>
-          </div>
-        )}
+          )}
+        </div>
+
         <div className="mt-6 px-4 lg:px-0">
           <div className="font-nunito font-normal text-[24px] leading-8 tracking-[-3%] title-color">
             Login
@@ -96,10 +107,15 @@ const LoginComponent = () => {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+              {error && (
+                <div className="text-red-500 text-sm mt-2">{error}</div>
+              )}
             </div>
             <div className="mt-6">
-              <button className="w-full py-4 text-white bg-[#1061E5] text-bold-color font-medium rounded" type="submit">
+              <button
+                className="w-full py-4 text-white bg-[#1061E5] text-bold-color font-medium rounded"
+                type="submit"
+              >
                 Login
               </button>
             </div>
