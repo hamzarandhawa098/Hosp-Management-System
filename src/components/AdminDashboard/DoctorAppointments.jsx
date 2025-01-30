@@ -48,7 +48,7 @@ const DoctorAppointments = ({ doctor }) => {
               <td className="p-2 border">{appointment.date}</td>
               <td
                 className={`p-2 border ${
-                  appointment.status === "Completed"
+                  appointment.status === "Accepted"
                     ? "text-green-500"
                     : appointment.status === "Pending"
                     ? "text-yellow-500"
