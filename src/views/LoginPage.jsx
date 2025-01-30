@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import LogoLarge from "../assets/images/Logo.png";
 import loginUser from "../api/loginUser";
 
-
 const LoginComponent = () => {
   const [activeTab, setActiveTab] = useState("Admin");
   const [email, setEmail] = useState("");
@@ -21,64 +20,32 @@ const LoginComponent = () => {
       setError("Please enter both email and password.");
       return;
     }
-    if (activeTab === "Admin") {
-      if (email === "admin@abc.com" && password === "pass123") {
-        navigate("/admin/dashboard");
+
+    try {
+      const { userData } = await loginUser(email, password);
+      if (userData.role === activeTab) {
+        localStorage.setItem("role", activeTab);
+        navigate(`/${activeTab.toLowerCase()}/dashboard`);
       } else {
-        setError("Invalid email or password.");
+        setError(`Only ${activeTab}s are Allowed to Login`);
       }
-    } else if (activeTab === "Doctor") {
-      try {
-        const { userData } = await loginUser(email, password);
-        console.log("User Data", userData);
-        if (userData.role === "Doctor") {
-          alert("Login Successful");
-          navigate("/doctor/dashboard");
-        } else {
-          setError("Only Doctors are Allowed to Login");
-        }
-      } catch (error) {
-        console.error("Login error:", error);
-        if (error.code === "auth/wrong-password") {
-          setError("Incorrect password.");
-        } else if (error.code === "auth/user-not-found") {
-          setError("No user found with this email.");
-        } else {
-          setError("Invalid Email/Password");
-        }
+    } catch (error) {
+      console.error("Login error:", error);
+      if (error.code === "auth/wrong-password") {
+        setError("Incorrect password.");
+      } else if (error.code === "auth/user-not-found") {
+        setError("No user found with this email.");
+      } else {
+        setError("Invalid Email/Password");
       }
-    } else if (activeTab === "Patient") {
-      try {
-        const { userData } = await loginUser(email, password);
-        console.log("User Data", userData);
-        if (userData.role === "Patient") {
-          alert("Login Successful");
-          navigate("/patient/dashboard");
-        } else {
-          setError("Only Patients are Allowed to Login");
-        }
-      } catch (error) {
-        console.error("Login error:", error);
-        if (error.code === "auth/wrong-password") {
-          setError("Incorrect password.");
-        } else if (error.code === "auth/user-not-found") {
-          setError("No user found with this email.");
-        } else {
-          setError("Invalid Email/Password");
-        }
-      }
+    }
   };
-};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="w-full max-w-[600px]">
         <div className="flex flex-col items-center">
-          <img
-            src={LogoLarge}
-            alt="Iwiina Lab Logo"
-            className="h-8 w-[147px]"
-          />
+          <img src={LogoLarge} alt="Iwiina Lab Logo" className="h-8 w-[147px]" />
           <div className="flex gap-3 mt-6 px-2 py-[5px] rounded-full bg-[#1061E5]">
             {tabs.map((tab) => (
               <button
@@ -95,12 +62,9 @@ const LoginComponent = () => {
         </div>
         {activeTab !== "Admin" && (
           <div className="flex justify-center text-[16px] font-semibold mt-2 font-poppins">
-            Don't have an account?{" "}
+            Don't have an account? {" "}
             <span className="ml-2">
-              <Link
-                to={registerPath}
-                className="hover:text-[#1061E5] hover:underline"
-              >
+              <Link to={registerPath} className="hover:text-[#1061E5] hover:underline">
                 Signup
               </Link>
             </span>
@@ -132,15 +96,10 @@ const LoginComponent = () => {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              {error && (
-                <div className="text-red-500 text-sm mt-2">{error}</div>
-              )}
+              {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
             </div>
             <div className="mt-6">
-              <button
-                className="w-full py-4 text-white bg-[#1061E5] text-bold-color font-medium rounded"
-                type="submit"
-              >
+              <button className="w-full py-4 text-white bg-[#1061E5] text-bold-color font-medium rounded" type="submit">
                 Login
               </button>
             </div>

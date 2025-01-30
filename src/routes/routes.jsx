@@ -1,5 +1,4 @@
-import { Routes } from "react-router-dom";
-import { Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import HomePage from "../views/HomePage";
 import LoginPage from "../views/LoginPage";
 import DoctorsSignupPage from "../views/DoctorsSignupPage";
@@ -7,24 +6,35 @@ import PatientsSignupPage from "../views/PatientsSignupPage";
 import DoctorDashboardPage from "../views/DoctorDashboardPage";
 import PatientsDashboardPage from "../views/PatientsDashboardPage";
 import AdminDashboardPage from "../views/AdminDashboardPage";
+import EditProfile from "../components/global/EditProfile";
 
+import PrivateRoute from "./PrivateRoute"; 
 
 const routes = () => {
-    return (
-      <>
-        <Routes>
+  return (
+    <>
+      <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/doctor/register" element={<DoctorsSignupPage />} />
         <Route path="/patient/register" element={<PatientsSignupPage />} />
-        <Route path="/doctor/dashboard" element={<DoctorDashboardPage />} />
-        <Route path="/patient/dashboard" element={<PatientsDashboardPage />} />
-        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
 
-        </Routes>
-        </>
-    );
-
-}
+        <Route
+          path="/doctor/dashboard"
+          element={<PrivateRoute element={<DoctorDashboardPage />} requiredRole="Doctor" />}
+        />
+        <Route
+          path="/patient/dashboard"
+          element={<PrivateRoute element={<PatientsDashboardPage />} requiredRole="Patient" />}
+        />
+        <Route
+          path="/admin/dashboard"
+          element={<PrivateRoute element={<AdminDashboardPage />} requiredRole="Admin" />}
+        />
+      </Routes>
+    </>
+  );
+};
 
 export default routes;
