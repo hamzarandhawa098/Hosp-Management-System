@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import axiosInstance from "../../api/axiosConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, updateDoc } from "firebase/firestore";
+import Loader from "../global/Loader";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const auth = getAuth();
 const db = getFirestore();
@@ -64,30 +68,64 @@ function AppointmentsRequest() {
   };
 
   const handleAccept = async (appointment) => {
-    const documentId = appointment.name.split("/").pop(); 
+    toast.info("Accepting appointment...", {
+      position: "top-right",
+      autoClose: 2000,
+    });
+  
+    const documentId = appointment.name.split("/").pop();
     const success = await updateAppointmentStatus(documentId, "Accepted");
+  
     if (success) {
+      toast.success("Appointment accepted successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+  
       setAppointments((prevAppointments) =>
         prevAppointments.filter((app) => app.name !== appointment.name)
       );
+    } else {
+      toast.error("Failed to accept the appointment. Please try again.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
   };
-
+  
   const handleCancel = async (appointment) => {
-    const documentId = appointment.name.split("/").pop(); 
+    toast.info("Cancelling appointment...", {
+      position: "top-right",
+      autoClose: 2000,
+    });
+  
+    const documentId = appointment.name.split("/").pop();
     const success = await updateAppointmentStatus(documentId, "Cancelled");
+  
     if (success) {
+      toast.success("Appointment cancelled successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+  
       setAppointments((prevAppointments) =>
         prevAppointments.filter((app) => app.name !== appointment.name)
       );
+    } else {
+      toast.error("Failed to cancel the appointment. Please try again.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
   };
+  
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><Loader /></div>;
   if (error) return <div>{error}</div>;
 
   return (
     <div className="bg-white w-full rounded-lg shadow-md">
+          <ToastContainer />
       <div className="px-5 py-8">
         <h1 className="text-2xl font-poppins font-semibold">Appointments Requested</h1>
       </div>

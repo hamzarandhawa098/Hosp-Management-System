@@ -3,6 +3,7 @@ import axiosInstance from "../../api/axiosConfig";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { getAuth, onAuthStateChanged } from "firebase/auth"; 
+import Loader from "../global/Loader";
 
 dayjs.extend(customParseFormat);
 
@@ -111,7 +112,7 @@ function TodayAppointment() {
   const handleSeeAll = () => setShowAll((prev) => !prev);
 
   if (loading) {
-    return <p className="text-center py-6 text-gray-600">Loading...</p>;
+    return <Loader />
   }
 
   return (

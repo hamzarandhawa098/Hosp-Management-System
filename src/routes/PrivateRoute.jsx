@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import Loader from "../components/global/Loader";
 
 const PrivateRoute = ({ element, requiredRole }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -21,7 +22,7 @@ const PrivateRoute = ({ element, requiredRole }) => {
   }, []);
 
   if (isAuthenticated === null) {
-    return <div>Loading...</div>; 
+    return <div><Loader /></div>; 
   }
 
   if (!isAuthenticated || userRole !== requiredRole) {

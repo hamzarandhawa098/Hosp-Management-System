@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, updateDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosConfig";
 import userImage from "../../assets/images/userImage.png";
-import BackIcon from "../../assets/icons/Back.svg"
+import BackIcon from "../../assets/icons/Back.svg";
+import Loader from "./Loader";
+import LoaderWhite from "../global/LoaderWhite";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const EditProfile = () => {
   const [profileImage, setProfileImage] = useState(userImage);
@@ -18,6 +22,7 @@ const EditProfile = () => {
   const [loading, setLoading] = useState(true);
   const [isChanged, setIsChanged] = useState(false);
   const [documentId, setDocumentId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const auth = getAuth();
   const db = getFirestore();
@@ -96,6 +101,7 @@ const EditProfile = () => {
   };
 
   const handleSubmit = async (e) => {
+    setIsLoading(true);
     e.preventDefault();
 
     if (documentId) {
@@ -108,26 +114,41 @@ const EditProfile = () => {
           profileImage,
         });
 
-        console.log("Profile updated successfully!");
+        toast.success("Profile Updated Successfully!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
       } catch (error) {
-        console.error("Error updating profile:", error);
+        toast.error(`Profile Update Failed: ${error.message}`, {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   if (loading) {
-    return <div className="text-center mt-10">Loading...</div>;
+    return (
+      <div className="flex justify-center min-h-screen items-center">
+        <Loader />
+      </div>
+    );
   }
 
   return (
     <div className="w-full flex justify-center items-center min-h-screen bg-gray-100">
+      <ToastContainer />
       <div className="max-w-4xl w-full rounded-lg shadow-lg bg-white mx-auto p-8">
         <div className="p-6">
           <button
-            onClick={() => navigate(-1)} 
+            onClick={() => navigate(-1)}
             className="absolute top-4 left-4 p-2 bg-blue-500 rounded-full"
           >
-            <span><img src={BackIcon} alt="" className="w-8 h-8"/></span>
+            <span>
+              <img src={BackIcon} alt="" className="w-8 h-8" />
+            </span>
           </button>
 
           <h2 className="text-2xl font-poppins font-bold mb-6">Edit Profile</h2>
@@ -189,9 +210,13 @@ const EditProfile = () => {
               type="submit"
               disabled={!isChanged}
               className={`w-full font-poppins font-bold py-4 px-4 rounded-lg transition 
-                ${isChanged ? "bg-blue-500 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+                ${
+                  isChanged
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
             >
-              Save Changes
+              {isLoading ? <LoaderWhite /> : "Save Changes"}
             </button>
           </form>
         </div>

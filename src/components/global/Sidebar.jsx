@@ -1,21 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../firebase/firebaseConfig';
-import axiosInstance from '../../api/axiosConfig'; 
-import DashboardIcon from '../../assets/icons/Dashboard.svg';
-import LogoutIcon from '../../assets/icons/Logout.svg';
-import LogoWhite from '../../assets/images/LogoWhite.png';
-import UserImage from '../../assets/images/UserImage.png';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase/firebaseConfig";
+import axiosInstance from "../../api/axiosConfig";
+import DashboardIcon from "../../assets/icons/Dashboard.svg";
+import LogoutIcon from "../../assets/icons/Logout.svg";
+import LogoWhite from "../../assets/images/LogoWhite.png";
+import UserImage from "../../assets/images/UserImage.png";
+import LoaderWhite from "./LoaderWhite";
 
 const Sidebar = () => {
   const history = useNavigate();
-  const [userName, setUserName] = useState('John Doe');
-  const [userRole, setUserRole] = useState('Admin');
+  const [userName, setUserName] = useState("John Doe");
+  const [userRole, setUserRole] = useState("Admin");
   const [profileImage, setProfileImage] = useState(UserImage);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
+      setIsLoading(true);
       try {
         const response = await axiosInstance.get("/users");
         const users = response.data.documents;
@@ -28,9 +31,11 @@ const Sidebar = () => {
           );
 
           if (matchedUser) {
-            const fetchedName = matchedUser.fields.name?.stringValue || "userName";
+            const fetchedName =
+              matchedUser.fields.name?.stringValue || "userName";
             const fetchedRole = matchedUser.fields.role?.stringValue || "Role";
-            const fetchedProfileImage = matchedUser.fields.profileImage?.stringValue || UserImage;
+            const fetchedProfileImage =
+              matchedUser.fields.profileImage?.stringValue || UserImage;
 
             setUserName(fetchedName);
             setUserRole(fetchedRole);
@@ -38,19 +43,21 @@ const Sidebar = () => {
           }
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchUserData();
-  }, []); 
+  }, []);
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      history.push('/login');
+      history.push("/login");
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
@@ -71,18 +78,24 @@ const Sidebar = () => {
           <span className="text-xl font-semibold font-poppins">Dashboard</span>
         </Link>
       </div>
-
-      <Link to="/edit-profile" className="flex items-center justify-start gap-4 mb-4 w-full">
-        <img
-          src={profileImage}
-          alt="User"
-          className="w-14 h-14 rounded-full"
-        />
-        <div className='flex-col justify-center flex'>
-          <h4 className="text-base font-semibold font-poppins">{userName}</h4>
-          <p className="text-sm font-poppins text-gray-200">{userRole}</p>
-        </div>
-      </Link>
+      {isLoading ? (
+        <LoaderWhite />
+      ) : (
+        <Link
+          to="/edit-profile"
+          className="flex items-center justify-start gap-4 mb-4 w-full"
+        >
+          <img
+            src={profileImage}
+            alt="User"
+            className="w-14 h-14 rounded-full"
+          />
+          <div className="flex-col justify-center flex">
+            <h4 className="text-base font-semibold font-poppins">{userName}</h4>
+            <p className="text-sm font-poppins text-gray-200">{userRole}</p>
+          </div>
+        </Link>
+      )}
 
       <button
         onClick={handleLogout}

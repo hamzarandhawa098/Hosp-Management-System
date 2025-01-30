@@ -5,6 +5,10 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "../../firebase/firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import Loader from "../global/Loader";
+import LoaderWhite from "../global/LoaderWhite";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const auth = getAuth();
 
@@ -25,6 +29,7 @@ function PatientsBookAppointment() {
   const [doctorUid, setDoctorUid] = useState("");
   const [patientUid, setPatientUid] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isloading, setIsLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [slots, setSlots] = useState([
     "10:00 AM - 11:00 AM",
@@ -94,6 +99,7 @@ function PatientsBookAppointment() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (!patientUid) {
       alert("Please log in before booking an appointment.");
@@ -144,10 +150,12 @@ function PatientsBookAppointment() {
         status: { stringValue: "Pending" },
       },
     };
-
     try {
       await axiosInstance.post(`/appointments`, appointmentData);
-      alert("Appointment Booked Successfully!");
+      toast.success("Appointment Booked Successfully!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
       setFormData({
         name: "",
         age: "",
@@ -161,18 +169,24 @@ function PatientsBookAppointment() {
       });
     } catch (error) {
       console.error("Failed to book appointment:", error);
-      alert("Failed to book appointment. Please try again.");
+      toast.error("Booking Failed", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="mx-auto px-6 py-6">
+      <ToastContainer />
       <h1 className="text-xl font-bold text-center font-poppins mb-4">
         Book Appointment
       </h1>
 
       {loading ? (
-        <p className="text-center text-gray-500">Loading doctors...</p>
+        <Loader />
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -283,7 +297,7 @@ function PatientsBookAppointment() {
             type="submit"
             className="w-full bg-blue-500 text-white py-4 rounded-md hover:bg-blue-600 transition duration-200"
           >
-            Book Appointment
+            {isloading ? <LoaderWhite /> : "Book Appointment"}
           </button>
         </form>
       )}

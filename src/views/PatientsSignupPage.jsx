@@ -2,9 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoLarge from "../assets/images/Logo.png";
 import signupPatient from "../api/signUpPatient";
+import Loader from "../components/global/LoaderWhite";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const PatientsRegistration = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     email: "",
@@ -98,7 +103,8 @@ const PatientsRegistration = () => {
 
   const submitForm = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
+  
     if (validateForm()) {
       try {
         await signupPatient(
@@ -109,16 +115,25 @@ const PatientsRegistration = () => {
           form.address,
           form.dob
         );
-        alert("Sign Up Successful");
-        navigate("/login");
+        toast.success("Sign Up Successful!", {
+          position: "top-right",
+          autoClose: 2000, 
+        });
+        setTimeout(() => navigate("/login"), 2000); 
       } catch (error) {
-        alert(`Signup failed: ${error.message}`);
+        toast.error(`Signup failed: ${error.message}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } finally {
+        setLoading(false);
       }
     }
   };
-
+  
   return (
     <div className="flex flex-col py-[92px] items-center justify-center">
+          <ToastContainer />
       <div className="w-full max-w-[600px] bg-white">
         <div className="text-center mb-6">
           <img
@@ -262,7 +277,7 @@ const PatientsRegistration = () => {
                 type="submit"
                 className="px-6 rounded-lg w-full py-4 bg-[#1061E5] text-white"
               >
-                Sign Up
+                {loading ? <Loader /> : "Sign Up"}
               </button>
             </div>
           </div>

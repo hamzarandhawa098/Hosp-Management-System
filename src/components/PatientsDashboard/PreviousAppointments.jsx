@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../api/axiosConfig";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import Loader from "../global/Loader";
 
 const auth = getAuth();
 
@@ -51,7 +52,7 @@ function PreviousAppointments() {
     return () => clearInterval(interval); 
   }, [patientId]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><Loader /></div>;
   if (error) return <div>{error}</div>;
 
   if (appointments.length === 0) {

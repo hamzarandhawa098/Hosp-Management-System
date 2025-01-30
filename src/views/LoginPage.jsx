@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LogoLarge from "../assets/images/Logo.png";
 import loginUser from "../api/loginUser";
+import LoaderWhite from "../components/global/LoaderWhite";
 
 const LoginComponent = () => {
   const [activeTab, setActiveTab] = useState("Admin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const tabs = ["Admin", "Doctor", "Patient"];
@@ -15,12 +17,13 @@ const LoginComponent = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     if (!email || !password) {
       setError("Please enter both email and password.");
       return;
     }
 
+    setLoading(true);
+    setError("");
     try {
       const { userData } = await loginUser(email, password);
       if (userData.role === activeTab) {
@@ -39,17 +42,14 @@ const LoginComponent = () => {
         setError("Invalid Email/Password");
       }
     }
+    setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="w-full max-w-[600px]">
         <div className="flex flex-col items-center">
-          <img
-            src={LogoLarge}
-            alt="Iwiina Lab Logo"
-            className="h-8 w-[147px]"
-          />
+          <img src={LogoLarge} alt="Iwiina Lab Logo" className="h-8 w-[147px]" />
           <div className="flex gap-3 mt-6 px-2 py-[5px] rounded-full bg-[#1061E5]">
             {tabs.map((tab) => (
               <button
@@ -68,12 +68,9 @@ const LoginComponent = () => {
         <div className="flex justify-center text-[16px] font-semibold mt-2 font-poppins min-h-[24px]">
           {activeTab !== "Admin" && (
             <span className="flex">
-              Don't have an account?{" "}
+              Don't have an account? {" "}
               <span className="ml-2">
-                <Link
-                  to={registerPath}
-                  className="hover:text-[#1061E5] hover:underline"
-                >
+                <Link to={registerPath} className="hover:text-[#1061E5] hover:underline">
                   Signup
                 </Link>
               </span>
@@ -107,16 +104,15 @@ const LoginComponent = () => {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              {error && (
-                <div className="text-red-500 text-sm mt-2">{error}</div>
-              )}
+              {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
             </div>
             <div className="mt-6">
               <button
                 className="w-full py-4 text-white bg-[#1061E5] text-bold-color font-medium rounded"
                 type="submit"
+                disabled={loading}
               >
-                Login
+                {loading ? <LoaderWhite /> : "Login"}
               </button>
             </div>
           </form>
