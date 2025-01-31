@@ -10,9 +10,9 @@ import UserImage from "../../assets/images/UserImage.png";
 import LoaderWhite from "./LoaderWhite";
 
 const Sidebar = () => {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const [userName, setUserName] = useState("John Doe");
-  const [userRole, setUserRole] = useState("Admin");
+  const [userRole, setUserRole] = useState("");
   const [profileImage, setProfileImage] = useState(UserImage);
   const [isLoading, setIsLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -31,8 +31,8 @@ const Sidebar = () => {
           );
 
           if (matchedUser) {
-            setUserName(matchedUser.fields.name?.stringValue || "userName");
-            setUserRole(matchedUser.fields.role?.stringValue || "Role");
+            setUserName(matchedUser.fields.name?.stringValue || "John Doe");
+            setUserRole(matchedUser.fields.role?.stringValue || "User");
             setProfileImage(
               matchedUser.fields.profileImage?.stringValue || UserImage
             );
@@ -48,10 +48,20 @@ const Sidebar = () => {
     fetchUserData();
   }, []);
 
+  const handleDashboardClick = () => {
+    if (userRole === "Admin") {
+      navigate("/admin/dashboard");
+    } else if (userRole === "Doctor") {
+      navigate("/doctor/dashboard");
+    }else{
+      navigate("/patient/dashboard")
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      history("/login");
+      navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -65,13 +75,13 @@ const Sidebar = () => {
       </div>
 
       <div
-        className={`fixed  lg:flex min-h-screen flex-col w-[250px] lg:w-[320px] bg-blue-500 text-white h-full p-4 ${
+        className={`fixed lg:flex min-h-screen flex-col w-[250px] lg:w-[320px] bg-blue-500 text-white h-full p-4 ${
           isSidebarOpen ? "block" : "hidden"
         }`}
       >
         {isSidebarOpen && (
           <div
-            className="fixed inset-0   lg:hidden"
+            className="fixed inset-0 lg:hidden"
             onClick={() => setIsSidebarOpen(false)}
           ></div>
         )}
@@ -81,18 +91,19 @@ const Sidebar = () => {
             <img src={LogoWhite} alt="Logo" className="w-32" />
           </div>
 
-          <div className=" flex flex-col space-y-4 flex-grow">
-            <Link
-              to="#"
-              className="flex items-center space-x-4 hover:bg-blue-600 p-2 rounded"
+          <div className="flex flex-col space-y-4 flex-grow">
+            <button
+              onClick={handleDashboardClick}
+              className="flex items-center space-x-4 hover:bg-blue-600 p-2 rounded w-full text-left"
             >
               <img src={DashboardIcon} alt="Dashboard" className="w-8 h-8" />
               <span className="text-xl font-semibold font-poppins">
                 Dashboard
               </span>
-            </Link>
+            </button>
           </div>
-          <div className=" absolute  bottom-4">
+
+          <div className="absolute bottom-4">
             {isLoading ? (
               <LoaderWhite />
             ) : (
@@ -110,6 +121,7 @@ const Sidebar = () => {
                 </div>
               </Link>
             )}
+
             <button
               onClick={handleLogout}
               className="flex items-center space-x-4 hover:bg-blue-600 p-2 rounded w-full text-left"

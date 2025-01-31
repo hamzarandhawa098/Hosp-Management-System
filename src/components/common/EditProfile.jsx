@@ -4,7 +4,6 @@ import { getFirestore, doc, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosConfig";
 import userImage from "../../assets/images/userImage.png";
-import BackIcon from "../../assets/icons/Back.svg";
 import Loader from "./Loader";
 import LoaderWhite from "../common/LoaderWhite";
 import { ToastContainer, toast } from "react-toastify";
