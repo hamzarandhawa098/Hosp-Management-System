@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LogoLarge from "../assets/images/Logo.png";
 import loginUser from "../api/loginUser";
-import LoaderWhite from "../components/global/LoaderWhite";
+import LoaderWhite from "../components/common/LoaderWhite";
 
 const LoginComponent = () => {
   const [activeTab, setActiveTab] = useState("Admin");
@@ -54,7 +54,7 @@ const LoginComponent = () => {
             {tabs.map((tab) => (
               <button
                 key={tab}
-                className={`px-16 py-3 font-nunito font-semibold rounded-full text-[14px] leading-[20px] tracking-[-0.02px] text-bold-color ${
+                className={`lg:px-16 px-8 py-3 font-nunito font-semibold rounded-full text-[14px] leading-[20px] tracking-[-0.02px] text-bold-color ${
                   activeTab === tab ? "bg-white" : "bg-[#1061E5] text-white"
                 }`}
                 onClick={() => setActiveTab(tab)}

@@ -1,5 +1,5 @@
 import HeroBanner from "../components/HomePage/HeroBanner";
-import Navbar from "../components/global/Navbar";
+import Navbar from "../components/common/Navbar";
 
 const HomePage = () => {
 

@@ -1,9 +1,9 @@
 import axios from "axios";
 import { auth } from "../firebase/firebaseConfig";
-import { useNavigate } from "react-router-dom";  
+import { useNavigate } from "react-router-dom";
 
 const axiosInstance = axios.create({
-  baseURL: `https://firestore.googleapis.com/v1/projects/hospital-management-syst-23152/databases/(default)/documents`,
+  baseURL: `https://firestore.googleapis.com/v1/projects/hospital-management-812b3/databases/(default)/documents`,
   headers: {
     "Content-Type": "application/json",
   },
@@ -28,13 +28,13 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     if (error.response) {
       if (error.response.status === 404) {
         console.error("Resource not found: ", error.response.config.url);
         await auth.signOut();
-        navigate("/login");  
+        navigate("/login");
       }
     } else {
       if (error.message.includes("Network Error")) {

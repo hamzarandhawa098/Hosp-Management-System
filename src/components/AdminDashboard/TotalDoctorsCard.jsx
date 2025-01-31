@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosConfig";
-import Loader from "../global/Loader";
+import Loader from "../common/Loader";
 
 const TotalDoctorsCard = () => {
   const [totalDoctors, setTotalDoctors] = useState(0);

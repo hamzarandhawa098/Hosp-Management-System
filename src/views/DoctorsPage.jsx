@@ -1,4 +1,4 @@
-import Sidebar from "../components/global/Sidebar";
+import Sidebar from "../components/common/Sidebar";
 import TopBar from "../components/DoctorsDashboard/TopBar";
 import DoctorDashboardPage from "./DoctorDashboardPage";
 function DoctorsPage() {

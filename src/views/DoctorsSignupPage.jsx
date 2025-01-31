@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoLarge from "../assets/images/Logo.png";
 import signupUser from "../api/signUpDoctor";
-import Loader from "../components/global/LoaderWhite";
+import Loader from "../components/common/LoaderWhite";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -175,7 +175,7 @@ const DoctorRegistration = () => {
             Registration
           </div>
           <div className="space-y-6 mt-6">
-            <div className="flex gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               <div>
                 <input
                   type="text"
@@ -183,7 +183,7 @@ const DoctorRegistration = () => {
                   value={form.email}
                   onChange={handleChange}
                   placeholder={placeholders.email}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-2">{errors.email}</p>
@@ -197,7 +197,7 @@ const DoctorRegistration = () => {
                   value={form.fullname}
                   onChange={handleChange}
                   placeholder={placeholders.fullname}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 {errors.fullname && (
                   <p className="text-red-500 text-sm mt-2">{errors.fullname}</p>
@@ -205,7 +205,7 @@ const DoctorRegistration = () => {
               </div>
             </div>
 
-            <div className="flex gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               <div className="relative">
                 <input
                   type={passwordVisible ? "text" : "password"}
@@ -213,7 +213,7 @@ const DoctorRegistration = () => {
                   value={form.password}
                   onChange={handleChange}
                   placeholder={placeholders.password}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 <button
                   type="button"
@@ -234,7 +234,7 @@ const DoctorRegistration = () => {
                   value={form.repassword}
                   onChange={handleChange}
                   placeholder={placeholders.repassword}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 <button
                   type="button"
@@ -290,7 +290,7 @@ const DoctorRegistration = () => {
             {errors.gender && (
               <p className="text-red-500 text-sm">{errors.gender}</p>
             )}
-            <div className="flex gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               <div>
                 <input
                   type="text"
@@ -298,7 +298,7 @@ const DoctorRegistration = () => {
                   value={form.contact}
                   onChange={handleChange}
                   placeholder={placeholders.contact}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 {errors.contact && (
                   <p className="text-red-500 text-sm mt-2">{errors.contact}</p>
@@ -312,7 +312,7 @@ const DoctorRegistration = () => {
                   value={form.specialization}
                   onChange={handleChange}
                   placeholder={placeholders.specialization}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 {errors.specialization && (
                   <p className="text-red-500 text-sm mt-2">
@@ -321,7 +321,7 @@ const DoctorRegistration = () => {
                 )}
               </div>
             </div>
-            <div className="flex gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               <div>
                 <input
                   type="text"
@@ -329,7 +329,7 @@ const DoctorRegistration = () => {
                   value={form.cnic}
                   onChange={handleChange}
                   placeholder={placeholders.cnic}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 {errors.cnic && (
                   <p className="text-red-500 text-sm mt-2">{errors.cnic}</p>
@@ -343,7 +343,7 @@ const DoctorRegistration = () => {
                   value={form.experience}
                   onChange={handleChange}
                   placeholder={placeholders.experience}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 {errors.experience && (
                   <p className="text-red-500 text-sm mt-2">

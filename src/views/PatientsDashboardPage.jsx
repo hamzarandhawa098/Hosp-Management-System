@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Sidebar from "../components/global/Sidebar";
+import Sidebar from "../components/common/Sidebar";
 import PatientsBookAppointment from "../components/PatientsDashboard/PatientsBookAppointment";
 import PreviousAppointments from "../components/PatientsDashboard/PreviousAppointments";
 
@@ -12,7 +12,7 @@ function PatientsDashboardPage() {
   return (
     <>
       <Sidebar />
-      <div className="ml-[320px] bg-[#EBEBEB] min-h-screen p-10 gap-6">
+      <div className="lg:ml-[320px] bg-[#EBEBEB] min-h-screen p-10 gap-6">
         <div className="flex justify-end px-12 ">
         <button
           onClick={openModal}

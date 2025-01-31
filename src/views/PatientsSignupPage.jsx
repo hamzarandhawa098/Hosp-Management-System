@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LogoLarge from "../assets/images/Logo.png";
 import signupPatient from "../api/signUpPatient";
-import Loader from "../components/global/LoaderWhite";
+import Loader from "../components/common/LoaderWhite";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -152,7 +152,7 @@ const PatientsRegistration = () => {
             Registration
           </div>
           <div className="space-y-6 mt-6">
-            <div className="flex gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               <div>
                 <input
                   type="text"
@@ -160,7 +160,7 @@ const PatientsRegistration = () => {
                   value={form.email}
                   onChange={handleChange}
                   placeholder={placeholders.email}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 {errors.email && (
                   <p className="text-red-500 text-sm mt-2">{errors.email}</p>
@@ -174,7 +174,7 @@ const PatientsRegistration = () => {
                   value={form.fullname}
                   onChange={handleChange}
                   placeholder={placeholders.fullname}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 {errors.fullname && (
                   <p className="text-red-500 text-sm mt-2">{errors.fullname}</p>
@@ -182,7 +182,7 @@ const PatientsRegistration = () => {
               </div>
             </div>
 
-            <div className="flex gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               <div className="relative">
                 <input
                   type={passwordVisible ? "text" : "password"}
@@ -190,7 +190,7 @@ const PatientsRegistration = () => {
                   value={form.password}
                   onChange={handleChange}
                   placeholder={placeholders.password}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 <button
                   type="button"
@@ -211,7 +211,7 @@ const PatientsRegistration = () => {
                   value={form.repassword}
                   onChange={handleChange}
                   placeholder={placeholders.repassword}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 <button
                   type="button"
@@ -228,7 +228,7 @@ const PatientsRegistration = () => {
               </div>
             </div>
 
-            <div className="flex gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               <div>
                 <input
                   type="date"
@@ -236,7 +236,7 @@ const PatientsRegistration = () => {
                   value={form.dob}
                   onChange={handleChange}
                   placeholder={placeholders.dob}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 {errors.dob && (
                   <p className="text-red-500 text-sm mt-2">{errors.dob}</p>
@@ -250,7 +250,7 @@ const PatientsRegistration = () => {
                   value={form.contact}
                   onChange={handleChange}
                   placeholder={placeholders.contact}
-                  className="w-[290px] border border-gray-300 px-4 py-4 rounded"
+                  className="w-full lg:w-[290px] border border-gray-300 px-4 py-4 rounded"
                 />
                 {errors.contact && (
                   <p className="text-red-500 text-sm mt-2">{errors.contact}</p>

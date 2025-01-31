@@ -3,7 +3,7 @@ import axiosInstance from "../../api/axiosConfig";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { getAuth, onAuthStateChanged } from "firebase/auth"; 
-import Loader from "../global/Loader";
+import Loader from "../common/Loader";
 
 dayjs.extend(customParseFormat);
 
@@ -117,7 +117,7 @@ function TodayAppointment() {
 
   return (
     <div className="w-full bg-white rounded-lg shadow-md">
-      <div className="flex justify-between px-6 py-4 border-b">
+      <div className="flex  justify-between px-6 py-4 border-b">
         <h3 className="text-xl font-semibold font-poppins">
           Upcoming Appointments
         </h3>
@@ -134,7 +134,7 @@ function TodayAppointment() {
         {displayedAppointments.length > 0 ? (
           displayedAppointments.map((appointment) => (
             <li key={appointment.id} className="px-6 py-4">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col justify-between items-center">
                 <h4 className="font-semibold font-poppins text-gray-800">
                   {appointment.patientName}
                 </h4>

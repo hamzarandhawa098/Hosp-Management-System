@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import Sidebar from "../components/global/Sidebar";
+import Sidebar from "../components/common/Sidebar";
 import TotalDoctorsCard from "../components/AdminDashboard/TotalDoctorsCard";
 import DoctorsList from "../components/AdminDashboard/DoctorsList";
 import DoctorAppointments from "../components/AdminDashboard/DoctorAppointments";
-import Modal from "../components/global/Modal";
+import Modal from "../components/common/Modal";
 
 const Dashboard = () => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -15,7 +15,7 @@ const Dashboard = () => {
       <div>
         <Sidebar />
       </div>
-      <div className="ml-[320px] p-6 bg-gray-100 min-h-screen">
+      <div className="lg:ml-[320px] p-6 bg-gray-100 min-h-screen">
         <h1 className="text-2xl font-bold mb-6">Hospital Admin Dashboard</h1>
         {}
         <TotalDoctorsCard />

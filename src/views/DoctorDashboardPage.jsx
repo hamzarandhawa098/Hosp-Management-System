@@ -1,4 +1,4 @@
-import Sidebar from "../components/global/Sidebar";
+import Sidebar from "../components/common/Sidebar";
 import TopBar from "../components/DoctorsDashboard/TopBar";
 import UpcomingAppointment from "../components/DoctorsDashboard/UpcomingAppointment"
 import AppointmentsRequest from "../components/DoctorsDashboard/AppointmentsRequest";
@@ -8,9 +8,9 @@ function DoctorDashboardPage () {
   return (
    <>
    <Sidebar />
-   <div className="ml-[320px]">
+   <div className="lg:ml-[320px]">
     <TopBar />
-    <div className="bg-[#EBEBEB] flex flex-col gap-10 py-20 px-20 min-h-screen">
+    <div className="bg-[#EBEBEB] flex flex-col gap-10 py-20 px-4 lg:px-20 min-h-screen">
         <UpcomingAppointment />
         <AppointmentsRequest />
     </div>

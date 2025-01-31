@@ -6,7 +6,7 @@ import axiosInstance from "../../api/axiosConfig";
 import userImage from "../../assets/images/userImage.png";
 import BackIcon from "../../assets/icons/Back.svg";
 import Loader from "./Loader";
-import LoaderWhite from "../global/LoaderWhite";
+import LoaderWhite from "../common/LoaderWhite";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -151,7 +151,7 @@ const EditProfile = () => {
             </span>
           </button>
 
-          <h2 className="text-2xl font-poppins font-bold mb-6">Edit Profile</h2>
+          <h2 className="text-2xl mt-10 lg:mt-0 text-center lg:text-left font-poppins font-bold mb-6">Edit Profile</h2>
 
           <form onSubmit={handleSubmit}>
             <div className="mb-6 flex items-center justify-center">

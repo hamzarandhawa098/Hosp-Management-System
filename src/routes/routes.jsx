@@ -6,7 +6,7 @@ import PatientsSignupPage from "../views/PatientsSignupPage";
 import DoctorDashboardPage from "../views/DoctorDashboardPage";
 import PatientsDashboardPage from "../views/PatientsDashboardPage";
 import AdminDashboardPage from "../views/AdminDashboardPage";
-import EditProfile from "../components/global/EditProfile";
+import EditProfile from "../components/common/EditProfile";
 
 import PrivateRoute from "./PrivateRoute"; 
 

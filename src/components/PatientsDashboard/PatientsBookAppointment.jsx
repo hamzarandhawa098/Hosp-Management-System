@@ -5,8 +5,8 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "../../firebase/firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import Loader from "../global/Loader";
-import LoaderWhite from "../global/LoaderWhite";
+import Loader from "../common/Loader";
+import LoaderWhite from "../common/LoaderWhite";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
