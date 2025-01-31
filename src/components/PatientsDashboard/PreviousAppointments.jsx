@@ -65,7 +65,7 @@ function PreviousAppointments() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <div className="w-full max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6 overflow-x-auto">
       <h1 className="text-xl font-bold mb-4">Previous Appointments</h1>
       <table className="w-full border-collapse border border-gray-300">
         <thead>

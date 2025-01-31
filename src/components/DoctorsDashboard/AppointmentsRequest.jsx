@@ -6,7 +6,6 @@ import Loader from "../common/Loader";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const auth = getAuth();
 const db = getFirestore();
 
@@ -72,16 +71,16 @@ function AppointmentsRequest() {
       position: "top-right",
       autoClose: 2000,
     });
-  
+
     const documentId = appointment.name.split("/").pop();
     const success = await updateAppointmentStatus(documentId, "Accepted");
-  
+
     if (success) {
       toast.success("Appointment accepted successfully!", {
         position: "top-right",
         autoClose: 3000,
       });
-  
+
       setAppointments((prevAppointments) =>
         prevAppointments.filter((app) => app.name !== appointment.name)
       );
@@ -92,22 +91,22 @@ function AppointmentsRequest() {
       });
     }
   };
-  
+
   const handleCancel = async (appointment) => {
     toast.info("Cancelling appointment...", {
       position: "top-right",
       autoClose: 2000,
     });
-  
+
     const documentId = appointment.name.split("/").pop();
     const success = await updateAppointmentStatus(documentId, "Cancelled");
-  
+
     if (success) {
       toast.success("Appointment cancelled successfully!", {
         position: "top-right",
         autoClose: 3000,
       });
-  
+
       setAppointments((prevAppointments) =>
         prevAppointments.filter((app) => app.name !== appointment.name)
       );
@@ -118,27 +117,41 @@ function AppointmentsRequest() {
       });
     }
   };
-  
 
-  if (loading) return <div><Loader /></div>;
+  if (loading)
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
   if (error) return <div>{error}</div>;
 
   return (
     <div className="bg-white w-full rounded-lg shadow-md">
-          <ToastContainer />
+      <ToastContainer />
       <div className="px-5 py-8">
-        <h1 className="text-2xl font-poppins font-semibold">Appointments Requested</h1>
+        <h1 className="text-2xl font-poppins font-semibold">
+          Appointments Requested
+        </h1>
       </div>
 
-      <div className="p-5">
+      <div className="p-5 overflow-x-auto">
         {appointments.length > 0 ? (
           <table className="w-full text-left border-collapse">
             <thead>
               <tr>
-                <th className="py-2 px-4 font-poppins border-b text-sm font-medium">Patient Name</th>
-                <th className="py-2 px-4 font-poppins border-b text-sm font-medium">Appointment Time</th>
-                <th className="py-2 px-4 border-b font-poppins text-sm font-medium">Appointment Date</th>
-                <th className="py-2 px-4 border-b font-poppins text-sm font-medium">Actions</th>
+                <th className="py-2 px-4 font-poppins border-b text-sm font-medium">
+                  Patient Name
+                </th>
+                <th className="py-2 px-4 font-poppins border-b text-sm font-medium">
+                  Appointment Time
+                </th>
+                <th className="py-2 px-4 border-b font-poppins text-sm font-medium">
+                  Appointment Date
+                </th>
+                <th className="py-2 px-4 border-b font-poppins text-sm font-medium">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -154,18 +167,20 @@ function AppointmentsRequest() {
                     {appointment.fields.date?.stringValue || ""}
                   </td>
                   <td className="py-2 px-4 border-b">
-                    <button
-                      className="px-9 py-4 text-[16px] text-white bg-green-500 rounded-lg mr-2"
-                      onClick={() => handleAccept(appointment)}
-                    >
-                      Accept
-                    </button>
-                    <button
-                      className="px-9 py-4 text-[16px] text-white bg-red-500 rounded-lg"
-                      onClick={() => handleCancel(appointment)}
-                    >
-                      Cancel
-                    </button>
+                    <div className="flex gap-5">
+                      <button
+                        className="px-9 py-4 text-[16px] text-white bg-green-500 rounded-lg"
+                        onClick={() => handleAccept(appointment)}
+                      >
+                        Accept
+                      </button>
+                      <button
+                        className="px-9 py-4 text-[16px] text-white bg-red-500 rounded-lg"
+                        onClick={() => handleCancel(appointment)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

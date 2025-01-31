@@ -59,19 +59,19 @@ const Sidebar = () => {
 
   return (
     <>
-      <div className="bg-blue-500 text-white p-4 flex justify-between items-center md:hidden fixed top-0 left-0 w-full">
+      <div className="bg-blue-500 text-white p-4 flex justify-between items-center lg:hidden fixed top-0 left-0 w-full">
         <img src={LogoWhite} alt="Logo" className="w-24" />
         <button onClick={() => setIsSidebarOpen(true)}>Open</button>
       </div>
 
       <div
-        className={`fixed  md:flex min-h-screen flex-col w-[250px] lg:w-[320px] bg-blue-500 text-white h-full p-4 ${
+        className={`fixed  lg:flex min-h-screen flex-col w-[250px] lg:w-[320px] bg-blue-500 text-white h-full p-4 ${
           isSidebarOpen ? "block" : "hidden"
         }`}
       >
         {isSidebarOpen && (
           <div
-            className="fixed inset-0   md:hidden"
+            className="fixed inset-0   lg:hidden"
             onClick={() => setIsSidebarOpen(false)}
           ></div>
         )}

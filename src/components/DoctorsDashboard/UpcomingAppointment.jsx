@@ -134,7 +134,7 @@ function TodayAppointment() {
         {displayedAppointments.length > 0 ? (
           displayedAppointments.map((appointment) => (
             <li key={appointment.id} className="px-6 py-4">
-              <div className="flex flex-col justify-between items-center">
+              <div className="flex flex-col lg:flex-row justify-between items-center">
                 <h4 className="font-semibold font-poppins text-gray-800">
                   {appointment.patientName}
                 </h4>

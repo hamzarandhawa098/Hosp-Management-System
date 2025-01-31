@@ -9,6 +9,7 @@ import Loader from "./Loader";
 import LoaderWhite from "../common/LoaderWhite";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Sidebar from "./Sidebar";
 
 const EditProfile = () => {
   const [profileImage, setProfileImage] = useState(userImage);
@@ -138,90 +139,86 @@ const EditProfile = () => {
   }
 
   return (
-    <div className="w-full flex justify-center items-center min-h-screen bg-gray-100">
-      <ToastContainer />
-      <div className="max-w-4xl w-full rounded-lg shadow-lg bg-white mx-auto p-8">
-        <div className="p-6">
-          <button
-            onClick={() => navigate(-1)}
-            className="absolute top-4 left-4 p-2 bg-blue-500 rounded-full"
-          >
-            <span>
-              <img src={BackIcon} alt="" className="w-8 h-8" />
-            </span>
-          </button>
+    <>
+      <Sidebar />
+      <div className="w-full lg:ml-[170px] flex items-center  min-h-screen bg-gray-100">
+        <ToastContainer />
+        <div className="max-w-4xl w-full rounded-lg shadow-lg bg-white mx-auto p-8">
+          <div className="p-6">
+            <h2 className="text-2xl mt-10 lg:mt-0 text-center lg:text-left font-poppins font-bold mb-6">
+              Edit Profile
+            </h2>
 
-          <h2 className="text-2xl mt-10 lg:mt-0 text-center lg:text-left font-poppins font-bold mb-6">Edit Profile</h2>
-
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6 flex items-center justify-center">
-              <input
-                type="file"
-                id="profile-image"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              <label
-                htmlFor="profile-image"
-                className="cursor-pointer rounded-full overflow-hidden w-24 h-24 bg-gray-200 flex items-center justify-center"
-              >
-                <img
-                  src={profileImage}
-                  alt="Profile"
-                  className="object-cover"
+            <form onSubmit={handleSubmit}>
+              <div className="mb-6 flex items-center justify-center">
+                <input
+                  type="file"
+                  id="profile-image"
+                  onChange={handleImageChange}
+                  className="hidden"
                 />
-              </label>
-            </div>
+                <label
+                  htmlFor="profile-image"
+                  className="cursor-pointer rounded-full overflow-hidden w-24 h-24 bg-gray-200 flex items-center justify-center"
+                >
+                  <img
+                    src={profileImage}
+                    alt="Profile"
+                    className="object-cover"
+                  />
+                </label>
+              </div>
 
-            <div className="mb-6">
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full border border-gray-300 px-4 py-4 rounded"
-                placeholder="Enter your name"
-              />
-            </div>
+              <div className="mb-6">
+                <input
+                  type="text"
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full border border-gray-300 px-4 py-4 rounded"
+                  placeholder="Enter your name"
+                />
+              </div>
 
-            <div className="mb-6">
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-300 px-4 py-4 rounded"
-                placeholder="Enter your email"
-              />
-            </div>
+              <div className="mb-6">
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full border border-gray-300 px-4 py-4 rounded"
+                  placeholder="Enter your email"
+                />
+              </div>
 
-            <div className="mb-6">
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-gray-300 px-4 py-4 rounded"
-                placeholder="Enter your password"
-              />
-            </div>
+              <div className="mb-6">
+                <input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full border border-gray-300 px-4 py-4 rounded"
+                  placeholder="Enter your password"
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={!isChanged}
-              className={`w-full font-poppins font-bold py-4 px-4 rounded-lg transition 
+              <button
+                type="submit"
+                disabled={!isChanged}
+                className={`w-full font-poppins font-bold py-4 px-4 rounded-lg transition 
                 ${
                   isChanged
                     ? "bg-blue-500 text-white"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
-            >
-              {isLoading ? <LoaderWhite /> : "Save Changes"}
-            </button>
-          </form>
+              >
+                {isLoading ? <LoaderWhite /> : "Save Changes"}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

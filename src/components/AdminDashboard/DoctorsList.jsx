@@ -43,7 +43,7 @@ const DoctorsList = ({ setSelectedDoctor }) => {
           {doctors.map((doctor) => (
             <li
               key={doctor.id}
-              className="flex flex-col md:flex-row gap-4 lg:gap-0 py-10 lg:py-0 justify-between items-center p-2 border-b border-gray-200 last:border-none"
+              className="flex flex-col md:flex-row gap-4 lg:gap-0 py-10 lg:py-3 justify-between items-center p-2 border-b border-gray-200 last:border-none"
             >
               <div>
                 <p className="font-semibold">{doctor.name}</p>

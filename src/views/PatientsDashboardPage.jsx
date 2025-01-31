@@ -12,8 +12,8 @@ function PatientsDashboardPage() {
   return (
     <>
       <Sidebar />
-      <div className="lg:ml-[320px] bg-[#EBEBEB] min-h-screen p-10 gap-6">
-        <div className="flex justify-end px-12 ">
+      <div className="lg:ml-[320px] pt-20 bg-[#EBEBEB] min-h-screen p-3 lg:p-10 gap-6">
+        <div className="flex justify-center  lg:justify-end px-12 ">
         <button
           onClick={openModal}
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200"
