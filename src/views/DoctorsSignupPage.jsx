@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { signupDoctor } from "../redux/authSlice";
 import LogoLarge from "../assets/images/Logo.png";
-import signupUser from "../api/signUpDoctor";
 import Loader from "../components/common/LoaderWhite";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const DoctorRegistration = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -128,24 +130,17 @@ const DoctorRegistration = () => {
     if (validateForm()) {
       setLoading(true);
       try {
-        await signupUser(
-          form.email,
-          form.password,
-          form.fullname,
-          form.contact,
-          form.address,
-          form.gender,
-          form.specialization,
-          form.cnic,
-          form.experience
-        );
-        toast.success("Sign Up Successful!", {
-          position: "top-right",
-          autoClose: 2000,
-        });
-        setTimeout(() => navigate("/login"), 2000);
+        const result = await dispatch(signupDoctor(form));
+
+        if (result.payload) {
+          toast.success("Sign Up Successful!", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+          setTimeout(() => navigate("/login"), 2000);
+        }
       } catch (error) {
-        toast.error(`Signup failed: ${error.message}`, {
+        toast.error(`Signup failed: ${error}`, {
           position: "top-right",
           autoClose: 3000,
         });
@@ -154,6 +149,7 @@ const DoctorRegistration = () => {
       }
     }
   };
+
   return (
     <div className="flex flex-col py-[92px] items-center justify-center">
       <ToastContainer />
@@ -290,10 +286,11 @@ const DoctorRegistration = () => {
             {errors.gender && (
               <p className="text-red-500 text-sm">{errors.gender}</p>
             )}
+
             <div className="flex flex-col lg:flex-row gap-6">
               <div>
                 <input
-                  type="text"
+                  type="number"
                   id="contact"
                   value={form.contact}
                   onChange={handleChange}
@@ -321,10 +318,11 @@ const DoctorRegistration = () => {
                 )}
               </div>
             </div>
+
             <div className="flex flex-col lg:flex-row gap-6">
               <div>
                 <input
-                  type="text"
+                  type="number"
                   id="cnic"
                   value={form.cnic}
                   onChange={handleChange}

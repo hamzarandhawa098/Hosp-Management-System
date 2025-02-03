@@ -1,15 +1,16 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { signupPatient } from "../redux/authSlice"; 
 import LogoLarge from "../assets/images/Logo.png";
-import signupPatient from "../api/signUpPatient";
 import Loader from "../components/common/LoaderWhite";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const PatientsRegistration = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
 
   const [form, setForm] = useState({
     email: "",
@@ -103,37 +104,37 @@ const PatientsRegistration = () => {
 
   const submitForm = async (e) => {
     e.preventDefault();
-    setLoading(true);
-  
     if (validateForm()) {
       try {
-        await signupPatient(
-          form.email,
-          form.password,
-          form.fullname,
-          form.contact,
-          form.address,
-          form.dob
-        );
+        await dispatch(
+          signupPatient({
+            email: form.email,
+            password: form.password,
+            fullname: form.fullname,
+            contact: form.contact,
+            address: form.address,
+            dob: form.dob,
+          })
+        ).unwrap(); 
+
         toast.success("Sign Up Successful!", {
           position: "top-right",
-          autoClose: 2000, 
+          autoClose: 2000,
         });
-        setTimeout(() => navigate("/login"), 2000); 
+
+        setTimeout(() => navigate("/login"), 2000);
       } catch (error) {
-        toast.error(`Signup failed: ${error.message}`, {
+        toast.error(`Signup failed: ${error}`, {
           position: "top-right",
           autoClose: 3000,
         });
-      } finally {
-        setLoading(false);
       }
     }
   };
-  
+
   return (
     <div className="flex flex-col py-[92px] items-center justify-center">
-          <ToastContainer />
+      <ToastContainer />
       <div className="w-full max-w-[600px] bg-white">
         <div className="text-center mb-6">
           <img

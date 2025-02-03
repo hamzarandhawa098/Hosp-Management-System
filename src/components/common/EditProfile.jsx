@@ -1,133 +1,111 @@
-import { useState, useEffect } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, updateDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../api/axiosConfig";
-import userImage from "../../assets/images/userImage.png";
-import Loader from "./Loader";
-import LoaderWhite from "../common/LoaderWhite";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchUserProfile,
+  updateUserProfile,
+  setProfileImage,
+  resetUpdateStatus,
+} from "../../redux/profileSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loader from "./Loader";
+import LoaderWhite from "../common/LoaderWhite";
 import Sidebar from "./Sidebar";
 
 const EditProfile = () => {
-  const [profileImage, setProfileImage] = useState(userImage);
-  const [originalProfileImage, setOriginalProfileImage] = useState(userImage);
-  const [name, setName] = useState("");
-  const [originalName, setOriginalName] = useState("");
-  const [email, setEmail] = useState("");
-  const [originalEmail, setOriginalEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [originalPassword, setOriginalPassword] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [isChanged, setIsChanged] = useState(false);
-  const [documentId, setDocumentId] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const {
+    name,
+    email,
+    password,
+    profileImage,
+    documentId,
+    loading,
+    isUpdated,
+    error,
+  } = useSelector((state) => state.profile);
 
-  const auth = getAuth();
-  const db = getFirestore();
-  const navigate = useNavigate();
+  const [newName, setNewName] = useState(name);
+  const [newEmail, setNewEmail] = useState(email);
+  const [newPassword, setNewPassword] = useState(password);
+  const [isChanged, setIsChanged] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const response = await axiosInstance.get("/users");
-          const users = response.data.documents;
+    dispatch(fetchUserProfile());
+  }, [dispatch]);
 
-          const matchedUser = users.find(
-            (doc) => doc.fields.uid?.stringValue === user.uid
-          );
-
-          if (matchedUser) {
-            const fetchedName = matchedUser.fields.name?.stringValue || "";
-            const fetchedEmail = matchedUser.fields.email?.stringValue || "";
-            const fetchedPassword =
-              matchedUser.fields.password?.stringValue || "";
-
-            setName(fetchedName);
-            setOriginalName(fetchedName);
-            setEmail(fetchedEmail);
-            setOriginalEmail(fetchedEmail);
-            setPassword(fetchedPassword);
-            setOriginalPassword(fetchedPassword);
-
-            setDocumentId(matchedUser.name.split("/")[6]);
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setLoading(false);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
+  useEffect(() => {
+    setNewName(name);
+    setNewEmail(email);
+    setNewPassword(password);
+  }, [name, email, password]);
 
   useEffect(() => {
     if (
-      name !== originalName ||
-      email !== originalEmail ||
-      password !== originalPassword ||
-      profileImage !== originalProfileImage
+      newName !== name ||
+      newEmail !== email ||
+      newPassword !== password ||
+      profileImage !== ""
     ) {
       setIsChanged(true);
     } else {
       setIsChanged(false);
     }
-  }, [
-    name,
-    email,
-    password,
-    profileImage,
-    originalName,
-    originalEmail,
-    originalPassword,
-    originalProfileImage,
-  ]);
+  }, [newName, newEmail, newPassword, profileImage, name, email, password]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileImage(reader.result);
+        dispatch(setProfileImage(reader.result));
       };
       reader.readAsDataURL(file);
     }
   };
 
   const handleSubmit = async (e) => {
-    setIsLoading(true);
     e.preventDefault();
-
     if (documentId) {
-      try {
-        const userRef = doc(db, "users", documentId);
-        await updateDoc(userRef, {
-          name,
-          email,
-          password,
+      dispatch(
+        updateUserProfile({
+          documentId,
+          name: newName,
+          email: newEmail,
+          password: newPassword,
           profileImage,
-        });
-
-        toast.success("Profile Updated Successfully!", {
-          position: "top-right",
-          autoClose: 2000,
-        });
-      } catch (error) {
-        toast.error(`Profile Update Failed: ${error.message}`, {
-          position: "top-right",
-          autoClose: 2000,
-        });
-      } finally {
-        setIsLoading(false);
-      }
+        })
+      );
     }
   };
+  useEffect(() => {
+    const hasChanged =
+      name !== name ||
+      email !== email ||
+      password !== password ||
+      profileImage !== profileImage;
+
+    setIsChanged(hasChanged);
+  }, [
+    name,
+    email,
+    password,
+    profileImage,
+    name,
+    email,
+    password,
+    profileImage,
+  ]);
+
+  useEffect(() => {
+    if (isUpdated) {
+      toast.success("Profile Updated Successfully!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      dispatch(resetUpdateStatus());
+    }
+  }, [isUpdated, dispatch]);
 
   if (loading) {
     return (
@@ -140,81 +118,63 @@ const EditProfile = () => {
   return (
     <>
       <Sidebar />
-      <div className="w-full lg:ml-[170px] flex items-center  min-h-screen bg-gray-100">
+      <div className="w-full flex justify-center items-center min-h-screen bg-gray-100">
         <ToastContainer />
-        <div className="max-w-4xl w-full rounded-lg shadow-lg bg-white mx-auto p-8">
-          <div className="p-6">
-            <h2 className="text-2xl mt-10 lg:mt-0 text-center lg:text-left font-poppins font-bold mb-6">
-              Edit Profile
-            </h2>
-
-            <form onSubmit={handleSubmit}>
-              <div className="mb-6 flex items-center justify-center">
-                <input
-                  type="file"
-                  id="profile-image"
-                  onChange={handleImageChange}
-                  className="hidden"
+        <div className="max-w-4xl lg:ml-[320px] mt-20 lg:mt-0 w-full rounded-lg shadow-lg bg-white p-8">
+          <h2 className="text-2xl text-center font-bold mb-6">Edit Profile</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-6 flex items-center justify-center">
+              <input
+                type="file"
+                id="profile-image"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <label
+                htmlFor="profile-image"
+                className="cursor-pointer w-24 h-24 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center"
+              >
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="object-cover"
                 />
-                <label
-                  htmlFor="profile-image"
-                  className="cursor-pointer rounded-full overflow-hidden w-24 h-24 bg-gray-200 flex items-center justify-center"
-                >
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    className="object-cover"
-                  />
-                </label>
-              </div>
-
-              <div className="mb-6">
-                <input
-                  type="text"
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-4 rounded"
-                  placeholder="Enter your name"
-                />
-              </div>
-
-              <div className="mb-6">
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-4 rounded"
-                  placeholder="Enter your email"
-                />
-              </div>
-
-              <div className="mb-6">
-                <input
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-4 rounded"
-                  placeholder="Enter your password"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={!isChanged}
-                className={`w-full font-poppins font-bold py-4 px-4 rounded-lg transition 
+              </label>
+            </div>
+            <input
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className="w-full px-4 py-4 mb-6 border rounded"
+              placeholder="Name"
+            />
+            <input
+              type="email"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              className="w-full px-4 py-4 mb-6 border rounded"
+              placeholder="Email"
+            />
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full px-4 py-4 mb-6 border rounded"
+              placeholder="Password"
+            />
+            <button
+              type="submit"
+              disabled={!isChanged}
+              className={`w-full font-poppins font-bold py-4 px-4 rounded-lg transition 
                 ${
                   isChanged
                     ? "bg-blue-500 text-white"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
-              >
-                {isLoading ? <LoaderWhite /> : "Save Changes"}
-              </button>
-            </form>
-          </div>
+            >
+              {loading ? <LoaderWhite /> : "Save Changes"}
+            </button>
+          </form>
         </div>
       </div>
     </>
